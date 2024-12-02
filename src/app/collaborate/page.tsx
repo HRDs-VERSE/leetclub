@@ -32,7 +32,7 @@ export default function CollaboratePage() {
         userId: String(user?._id),
         page,
         limit,
-        type: "collaborate" as 'collaborate' | 'university' | 'group'
+        type: "collaborate" as 'collaborate' | 'university' | 'group' | "leetGroup" | "leetUniversity"
       };
 
       try {

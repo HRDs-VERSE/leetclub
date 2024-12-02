@@ -3,13 +3,13 @@ import { useToast } from "@/hooks/use-toast";
 type joinGroupData = {
     groupId: string
     userId: string
-    type: 'collaborate' | 'university' | 'group';
+    type: 'collaborate' | 'university' | 'group' | "leetGroup" | "leetUniversity";
 }
 
 type getJoinGroupData = {
     userId?: string
     groupId?: string
-    type?: 'collaborate' | 'university' | 'group';
+    type?: 'collaborate' | 'university' | 'group' | "leetGroup" | "leetUniversity";
     page?: number
     limit?: number
 }
