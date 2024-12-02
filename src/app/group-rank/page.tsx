@@ -12,8 +12,8 @@ export default function GroupCompetitionPage() {
   const user = useSelector((state: any) => state.user.userData, shallowEqual)
 
   const [groups, setGroups] = useState<any>()
-  const [sortedGroups, setSortedeGroups] = useState<any>()
 
+  const { sortedGroups, loading, error } = useFetchLeetCodePoints(groups);
 
   useEffect(() => {
     const getleetGroup = async () => {
@@ -29,15 +29,6 @@ export default function GroupCompetitionPage() {
   }, [])
 
 
-  useEffect(() => {
-    if (!groups) return
-    const getPerformance = async () => {
-      const result = await useFetchLeetCodePoints(groups)
-      setSortedeGroups(result)
-
-    }
-    getPerformance()
-  }, [groups])
 
 
   return (

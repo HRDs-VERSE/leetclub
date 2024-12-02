@@ -14,7 +14,7 @@ export default function CollegeCompetitionPage() {
   const { getAllGroup } = useGroupAPI()
   const user = useSelector((state: any) => state.user.userData, shallowEqual)
 
-  const [sortedColleges, setSortedColleges] = useState<any>()
+  const { sortedGroups, loading, error } = useFetchLeetCodePoints(colleges);
 
 
   useEffect(() => {
@@ -31,17 +31,6 @@ export default function CollegeCompetitionPage() {
   }, [])
 
 
-  useEffect(() => {
-    if (!colleges) return
-    const getPerformance = async () => {
-      const result = await useFetchLeetCodePoints(colleges)
-
-      setSortedColleges(result)
-
-    }
-    getPerformance()
-  }, [colleges])
-
   return (
     <div className="container mx-auto p-4 space-y-6 max-w-[45rem] m-auto">
       <h1 className="text-3xl font-bold">College Rank</h1>
@@ -52,7 +41,7 @@ export default function CollegeCompetitionPage() {
             No University here
           </div>
         }
-        {sortedColleges?.map((college: any) => (
+        {sortedGroups?.map((college: any) => (
           <GroupPerformance
             key={college._id}
             groupData={college}

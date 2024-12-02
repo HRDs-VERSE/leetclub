@@ -19,8 +19,11 @@ export default function CollaboratePage() {
   const [hasMore, setHasMore] = useState(true)
   const [friendsProfile, setFriendsProfile] = useState<any>()
   const [group, setGroup] = useState<any>()
+  const [joinedGroups, setJoinedGroups] = useState<any>()
   const [query, setQuery] = useState("")
+  const { leetCodeProfiles, loading } = useGetLeetProfile(joinedGroups);
 
+  
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -37,8 +40,7 @@ export default function CollaboratePage() {
         setGroup(data.joinedGroups[0].groupDetails)
 
         if (data.joinedGroups && data.joinedGroups.length > 0) {
-          const profiles = await useGetLeetProfile(data.joinedGroups);
-          setFriendsProfile(profiles);
+          setJoinedGroups(data.joinedGroups)
         } else {
           console.error("No joined groups found");
         }
@@ -74,7 +76,7 @@ export default function CollaboratePage() {
         }
         {!query &&
           <div className="grid gap-6 grid-cols-1">
-            {friendsProfile?.map((friend: any, index: number) => (
+            {leetCodeProfiles?.map((friend: any, index: number) => (
               <FriendPerformance
                 key={index}
                 profile={friend.profile}
