@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 
 
-export function GroupPerformance({ groupData, totalPoints, totalEasy, totalHard, totalMedium, totalQuestions  }: any) {
+export function GroupPerformance({ groupData, totalPoints, totalEasy, totalHard, totalMedium }: any) {
   
   const averagePoints = Math.round(totalPoints / groupData.membersCount)
 

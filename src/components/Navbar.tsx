@@ -17,16 +17,14 @@ const routes = [
 ]
 
 const Navbar = () => {
-    const { userId } = useParams();
     const pathname = usePathname()
-    const { updateSession, getUser } = useUserAPI()
+    const { updateSession } = useUserAPI()
     const router = useRouter()
     const user = useSelector((state: any) => state.user.userData, shallowEqual)
 
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [openLogout, setOpenLogout] = useState(false)
 
-    console.log(user)
 
     useEffect(() => {
         if (user?._id) {

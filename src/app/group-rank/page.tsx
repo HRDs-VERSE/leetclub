@@ -1,14 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { GroupPerformance } from "@/components/group-performance"
 import useGroupAPI from '@/fetchAPI/useGroupAPI'
-import useJoinGroupAPI from '@/fetchAPI/useJoinGroupAPI'
 import { shallowEqual, useSelector } from 'react-redux'
-import fetchLeetCodePoints from '@/lib/calculateLeetCodePoin'
+import useFetchLeetCodePoints from '@/lib/useCalculateLeetCodePoin'
 
 
 export default function GroupCompetitionPage() {
@@ -36,7 +32,7 @@ export default function GroupCompetitionPage() {
   useEffect(() => {
     if (!groups) return
     const getPerformance = async () => {
-      const result = await fetchLeetCodePoints(groups)
+      const result = await useFetchLeetCodePoints(groups)
       setSortedeGroups(result)
 
     }

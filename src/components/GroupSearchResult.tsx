@@ -6,13 +6,6 @@ import useGroupAPI from '@/fetchAPI/useGroupAPI'
 import { useDebounce } from 'use-debounce';
 import { shallowEqual, useSelector } from 'react-redux';
 
-const sampleGroups = [
-  { id: 1, name: "Algorithm Enthusiasts", memberCount: 150 },
-  { id: 2, name: "Competitive Coders United", memberCount: 75 },
-  { id: 3, name: "LeetCode Masters", memberCount: 200 },
-  { id: 4, name: "Data Structure Wizards", memberCount: 100 },
-]
-
 type prop = {
   query: string
 }

@@ -7,11 +7,7 @@ interface DifficultyBreakdownProps {
 }
 
 export function DifficultyBreakdown({ easy, medium, hard }: DifficultyBreakdownProps) {
-  const total = easy + medium + hard
-  const easyPercentage = (easy / total) * 100
-  const mediumPercentage = (medium / total) * 100
-  const hardPercentage = (hard / total) * 100
-
+  
   return (
     <div className="space-y-2">
       <div className="flex justify-between text-sm">

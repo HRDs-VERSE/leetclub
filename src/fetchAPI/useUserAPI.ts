@@ -38,7 +38,7 @@ const useUserAPI = () => {
 
             return data.user;
         } catch (error) {
-            return { message: "An error occurred while logging in. Please try again." };
+            return { message: "An error occurred while logging in. Please try again.", error };
         }
     }
 
@@ -91,7 +91,7 @@ const useUserAPI = () => {
             return { message: data.message };
 
         } catch (error) {
-            return { message: "An error occurred while logging out. Please try again." };
+            return { message: "An error occurred while logging out. Please try again.", error };
         }
     };
 
@@ -114,7 +114,7 @@ const useUserAPI = () => {
             return data
 
         } catch (error) {
-            return { message: "An error occurred while updating user. Please try again." };
+            return { message: "An error occurred while updating user. Please try again.", error };
         }
     };
 
@@ -136,7 +136,7 @@ const useUserAPI = () => {
                 return { message: data.message };
             }
         } catch (error) {
-            return { message: "An error occurred while deleting the user. Please try again." };
+            return { message: "An error occurred while deleting the user. Please try again.", error };
         }
     }
 

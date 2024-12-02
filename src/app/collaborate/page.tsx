@@ -6,7 +6,7 @@ import { FriendPerformance } from "@/components/friend-performance"
 import GroupSearchResult from '@/components/GroupSearchResult'
 import useJoinGroupAPI from '@/fetchAPI/useJoinGroupAPI'
 import { shallowEqual, useSelector } from 'react-redux'
-import getLeetProfile from '@/lib/getLeetProfile'
+import useGetLeetProfile from '@/lib/useGetLeetProfile'
 
 
 export default function CollaboratePage() {
@@ -37,7 +37,7 @@ export default function CollaboratePage() {
         setGroup(data.joinedGroups[0].groupDetails)
 
         if (data.joinedGroups && data.joinedGroups.length > 0) {
-          const profiles = await getLeetProfile(data.joinedGroups);
+          const profiles = await useGetLeetProfile(data.joinedGroups);
           setFriendsProfile(profiles);
         } else {
           console.error("No joined groups found");

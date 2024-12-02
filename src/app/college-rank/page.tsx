@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { GroupPerformance } from "@/components/group-performance"
 import { shallowEqual, useSelector } from 'react-redux'
 import useGroupAPI from '@/fetchAPI/useGroupAPI'
-import fetchLeetCodePoints from '@/lib/calculateLeetCodePoin'
+import useFetchLeetCodePoints from '@/lib/useCalculateLeetCodePoin'
 
 
 
@@ -34,7 +34,7 @@ export default function CollegeCompetitionPage() {
   useEffect(() => {
     if (!colleges) return
     const getPerformance = async () => {
-      const result = await fetchLeetCodePoints(colleges)
+      const result = await useFetchLeetCodePoints(colleges)
 
       setSortedColleges(result)
 

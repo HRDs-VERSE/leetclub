@@ -1,6 +1,6 @@
 import usePlatformAPI from "@/fetchAPI/usePlatformAPI";
 
-const calculateLeetCodePoints = async (groups: any[]) => {
+const useCalculateLeetCodePoints = async (groups: any[]) => {
     const { getLeetCodeProfile } = usePlatformAPI();
 
     const fetchLeetCodeProfile = async (username: string) => {
@@ -57,10 +57,10 @@ const calculateLeetCodePoints = async (groups: any[]) => {
     return groups;
 };
 
-const fetchLeetCodePoints = async (groups: any) => {
+const useFetchLeetCodePoints = async (groups: any) => {
     if (!groups) return;
     try {
-        const result = await calculateLeetCodePoints(groups);
+        const result = await useCalculateLeetCodePoints(groups);
         return result 
     } catch (error) {
         console.error("Error fetching LeetCode points:", error);
@@ -68,4 +68,4 @@ const fetchLeetCodePoints = async (groups: any) => {
 };
 
 
-export default fetchLeetCodePoints;
+export default useFetchLeetCodePoints;

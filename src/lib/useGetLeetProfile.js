@@ -1,6 +1,6 @@
 import usePlatformAPI from "@/fetchAPI/usePlatformAPI";
 
-const getLeetProfile = async (group) => {
+const useGetLeetProfile = async (group) => {
   const { getLeetCodeProfile } = usePlatformAPI()
 
   const leetCodeProfiles = await Promise.all(
@@ -19,5 +19,5 @@ const getLeetProfile = async (group) => {
   return leetCodeProfiles;
 };
 
-export default getLeetProfile;
+export default useGetLeetProfile;
 
