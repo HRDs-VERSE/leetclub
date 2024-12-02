@@ -17,6 +17,7 @@ export interface User extends Document {
   password: string;
   about?: string;
   isVerified: boolean;
+  newUserInfoDone: boolean
   techStack: TechStack[];
   competitivePlatforms: CompetitivePlatform[];
   verifyCode?: string;
@@ -70,6 +71,10 @@ const userSchema = new Schema<User>(
     about: {
       type: String,
       default: '', 
+    },
+    newUserInfoDone: {
+      type: Boolean,
+      default: false,
     },
     isOAuth: {
       type: Boolean,

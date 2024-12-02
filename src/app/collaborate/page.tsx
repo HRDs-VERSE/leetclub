@@ -23,7 +23,6 @@ export default function CollaboratePage() {
   const [query, setQuery] = useState("")
   const { leetCodeProfiles, loading } = useGetLeetProfile(joinedGroups);
 
-  
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -33,6 +32,7 @@ export default function CollaboratePage() {
         userId: String(user?._id),
         page,
         limit,
+        type: "collaborate" as 'collaborate' | 'university' | 'group'
       };
 
       try {
@@ -40,7 +40,7 @@ export default function CollaboratePage() {
         setGroup(data.joinedGroups[0].groupDetails)
 
         if (data.joinedGroups && data.joinedGroups.length > 0) {
-          setJoinedGroups(data.joinedGroups)
+          setJoinedGroups(data.joinedGroups[0].userDetails)
         } else {
           console.error("No joined groups found");
         }

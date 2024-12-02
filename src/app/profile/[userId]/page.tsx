@@ -8,6 +8,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
 
 import { DifficultyBreakdown } from "@/components/difficulty-breakdown"
 import { shallowEqual, useSelector } from "react-redux"
@@ -52,6 +64,7 @@ type UserType = {
   verifyCode: string;
   verifyCodeExpiry: Date;
   isOAuth?: boolean;
+  newUserInfoDone: boolean;
 };
 
 
@@ -68,20 +81,21 @@ export default function ProfilePage() {
   const { getLeetCodeProfile } = usePlatformAPI()
   const { createGroup } = useGroupAPI()
   const stringUserId = userId as string
-  const { getUser } = useUserAPI()
+  const { getUser, toggelUser } = useUserAPI()
   const user = useSelector((state: any) => state.user.userData, shallowEqual)
 
   const [userData, setUserData] = useState<UserType>()
   const [loading, setLoading] = useState(true)
   const [profileLoading, setProfileLoading] = useState(true)
   const [leetCodeProfile, setLeetCodeProfile] = useState<any>()
+  const [openAlert, setOpenAlert] = useState(false)
   const [openCreateGroup, setOpenCreateGroup] = useState(false)
   const [groupForm, setGroupForm] = useState<FormValues>({
     name: "",
     tagLine: "",
     type: "" as 'collaborate' | 'university' | 'group',
   });
-
+  
 
   const handleTypeChange = (value: 'collaborate' | 'university' | 'group') => {
     setGroupForm((prevFormData) => ({
@@ -89,6 +103,13 @@ export default function ProfilePage() {
       type: value,
     }));
   };
+
+  useEffect(() => {
+    if (userData?.newUserInfoDone === false){
+      console.log("user not done")
+      setOpenAlert(true)
+    }
+  }, [userData])
 
   const handleChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -137,6 +158,14 @@ export default function ProfilePage() {
     }
 
   }, [userData])
+
+  const handleToggelUser = async () => {
+    try {
+      await toggelUser(stringUserId)
+    } catch (error) {
+      console.error('Error toggling user:', error)
+    }
+  }
 
   return (
     <>
@@ -250,6 +279,51 @@ export default function ProfilePage() {
           </div>
         </DialogContent>
       </Dialog>
+      <AlertDialog open={openAlert} onOpenChange={setOpenAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Go through</AlertDialogTitle>
+            <AlertDialogDescription>
+              <div className="flex flex-col gap-4 text-white">
+                <h1 className="text-2xl font-bold">Welcome, {user?.username}!</h1>
+                <p className="text-sm text-gray-300">
+                  Explore the three types of groups you can create and join:
+                </p>
+                <div className="mt-2">
+                  <div className="mb-2">
+                    <h2 className="text-lg font-semibold text-white">Collaborate</h2>
+                    <p className="text-sm text-gray-300">
+                      Work with friends to enhance each other's performance.
+                    </p>
+                  </div>
+                  <div className="mb-2">
+                    <h2 className="text-lg font-semibold text-white">Group</h2>
+                    <p className="text-sm text-gray-300">
+                      Track and compare your ranks in group leaderboards.
+                    </p>
+                  </div>
+                  <div className="mb-2">
+                    <h2 className="text-lg font-semibold text-white">University</h2>
+                    <p className="text-sm text-gray-300">
+                      See how you rank in your university's leaderboard.
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-300">
+                  Note: You can only join one of each type of group and create
+                </p>
+                <p className="text-sm text-gray-400 italic mt-2">
+                  "Understand! you better understand"
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => handleToggelUser()}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
 
     </>
   )

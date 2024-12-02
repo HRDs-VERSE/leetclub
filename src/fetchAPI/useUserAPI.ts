@@ -28,7 +28,6 @@ const useUserAPI = () => {
 
     const getUser = async (userId: string) => {
         try {
-            console.log(userId)
             const response = await fetch(`/api/user/get-user/${userId}`);
             const data = await response.json();
 
@@ -140,6 +139,27 @@ const useUserAPI = () => {
         }
     }
 
+    const toggelUser = async (userId: string) => {
+        try {
+            const response = await fetch(`/api/user/toggle-detail?userId=${userId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                return { message: data.message };
+            } else {
+                return { message: data.message };
+            }
+        } catch (error) {
+            return { message: "An error occurred while deleting the user. Please try again.", error };
+        }
+    }
+
 
     return {
         updateSession,
@@ -149,6 +169,7 @@ const useUserAPI = () => {
         updateUser,
         logout,
         deleteUser,
+        toggelUser
     }
 };
 

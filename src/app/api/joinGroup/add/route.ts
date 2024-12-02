@@ -63,7 +63,7 @@ export const POST = async (req: NextRequest) => {
         await newJoinedGroup.save();
 
         return NextResponse.json(
-            { success: true, joinedGroup: newJoinedGroup },
+            { success: true, message: "Group Joined", joinedGroup: newJoinedGroup },
             { status: 201 }
         );
     } catch (error: any) {

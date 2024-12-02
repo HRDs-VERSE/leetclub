@@ -1,4 +1,5 @@
 import connectDB from "@/lib/connectDB";
+import Group from "@/models/group.model";
 import JoinedGroup from "@/models/joinedGroup.model";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -15,6 +16,21 @@ export const DELETE = async (req: NextRequest) => {
             );
         }
 
+        
+        const group = await Group.findById(groupId);
+
+
+        if (!group) {
+            return NextResponse.json(
+                { success: false, message: "Group not found" },
+                { status: 404 }
+            );
+        }
+
+        group.membersCount = group.membersCount - 1;
+        await group.save()
+
+
         const deletedGroup = await JoinedGroup.findOneAndDelete({ userId, groupId });
 
         if (!deletedGroup) {
@@ -25,7 +41,7 @@ export const DELETE = async (req: NextRequest) => {
         }
 
         return NextResponse.json(
-            { success: true, message: "Successfully left the group" },
+            { success: true, message: "Group Lefted" },
             { status: 200 }
         );
     } catch (error: any) {

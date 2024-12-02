@@ -1,13 +1,12 @@
 import connectDB from "@/lib/connectDB";
 import User from "@/models/user.model";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export const GET = async (req, { params }) => {
+export const PATCH = async (req: NextRequest) => {
     try {
         await connectDB();
 
-        const { userId } = await params;
-
+        const userId = req.nextUrl.searchParams.get("userId");
         if (!userId) {
             return NextResponse.json(
                 { error: "userId not given" },
@@ -15,7 +14,7 @@ export const GET = async (req, { params }) => {
             );
         }
 
-        const user = await User.findById(userId).select("-password -updatedAt -createdAt -verifyTokenExpiry -verifyToken -oAuthUID");
+        const user = await User.findById(userId)
 
         if (!user) {
             return NextResponse.json(
@@ -24,8 +23,11 @@ export const GET = async (req, { params }) => {
             );
         }
 
+        user.newUserInfoDone = true
+        await user.save()
+
         return NextResponse.json(
-            { message: "User found successfully", user },
+            {succes: false, message: "User toggled" },
             { status: 200 }
         );
     } catch (error) {

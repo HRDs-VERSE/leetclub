@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import ReduxProvider from "./reduxProvider";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "LeetClub",
@@ -20,6 +21,7 @@ export default function RootLayout({
         <Navbar/>
         <div>{children}</div>
       </ReduxProvider>
+      <Toaster/>
       </body>
     </html>
   );

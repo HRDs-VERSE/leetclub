@@ -1,14 +1,15 @@
+import { useToast } from "@/hooks/use-toast";
 
 type joinGroupData = {
     groupId: string
     userId: string
-    type: 'collaborate' | 'university' | 'group' | "leetGroup" | "leetUniversity";
+    type: 'collaborate' | 'university' | 'group';
 }
 
 type getJoinGroupData = {
     userId?: string
     groupId?: string
-    type?: 'collaborate' | 'university' | 'group' | "leetGroup" | "leetUniversity";
+    type?: 'collaborate' | 'university' | 'group';
     page?: number
     limit?: number
 }
@@ -24,6 +25,8 @@ type leaveGroupData = {
 }
 
 const useJoinGroupAPI = () => {
+    const { toast } = useToast()
+
     const joinGroup = async (joinGroupData: joinGroupData) => {
         try {
             const res = await fetch('/api/joinGroup/add', {
@@ -39,6 +42,9 @@ const useJoinGroupAPI = () => {
             }
 
             const data = await res.json()
+            toast({
+                description: data.message,
+              })
             return data
 
         } catch (error) {
@@ -85,6 +91,9 @@ const useJoinGroupAPI = () => {
             }
 
             const data = await res.json()
+            toast({
+                description: data.message,
+              })
             return data
 
         } catch (error) {
