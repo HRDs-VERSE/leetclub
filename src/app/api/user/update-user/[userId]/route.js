@@ -1,14 +1,9 @@
 import connectDB from "@/lib/connectDB";
 import User from "@/models/user.model";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-type Params = {
-    params: {
-        userId: string;
-    };
-};
 
-export const PATCH = async (req: NextRequest, { params }: Params) => {
+export const PATCH = async (req, { params }) => {
     try {
         await connectDB();
 
@@ -44,7 +39,7 @@ export const PATCH = async (req: NextRequest, { params }: Params) => {
             },
             { status: 200 }
         );
-    } catch (error: any) {
+    } catch (error) {
         console.error("Error updating user:", error.message);
 
         return NextResponse.json(
