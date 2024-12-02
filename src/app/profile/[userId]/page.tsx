@@ -285,7 +285,7 @@ export default function ProfilePage() {
             <AlertDialogTitle>Go through</AlertDialogTitle>
             <AlertDialogDescription>
               <div className="flex flex-col gap-4 text-white">
-                <h1 className="text-2xl font-bold">Welcome, {user?.username}!</h1>
+                <h1 className="text-2xl font-bold">Welcome &apos; {user?.username}!</h1>
                 <p className="text-sm text-gray-300">
                   Explore the three types of groups you can create and join:
                 </p>
@@ -293,7 +293,7 @@ export default function ProfilePage() {
                   <div className="mb-2">
                     <h2 className="text-lg font-semibold text-white">Collaborate</h2>
                     <p className="text-sm text-gray-300">
-                      Work with friends to enhance each other's performance.
+                      Work with friends to enhance each other&lsquo;s performance.
                     </p>
                   </div>
                   <div className="mb-2">
@@ -305,7 +305,7 @@ export default function ProfilePage() {
                   <div className="mb-2">
                     <h2 className="text-lg font-semibold text-white">University</h2>
                     <p className="text-sm text-gray-300">
-                      See how you rank in your university's leaderboard.
+                      See how you rank in your university&lsquo;s leaderboard.
                     </p>
                   </div>
                 </div>
@@ -313,7 +313,7 @@ export default function ProfilePage() {
                   Note: You can only join one of each type of group and create
                 </p>
                 <p className="text-sm text-gray-400 italic mt-2">
-                  "Understand! you better understand"
+                &quot;Understand! you better understand&quot;
                 </p>
               </div>
             </AlertDialogDescription>
