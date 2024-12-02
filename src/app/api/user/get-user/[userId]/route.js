@@ -1,8 +1,8 @@
 import connectDB from "@/lib/connectDB";
 import User from "@/models/user.model";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export const GET = async (req: NextRequest, { params }: { params: { userId: string } }) => {
+export const GET = async (req, { params }) => {
     try {
         await connectDB();
 

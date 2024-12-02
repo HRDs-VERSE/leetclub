@@ -22,6 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/api/joinGroup/leave/[userI]/user/logout/route.js", "src/lib/useGetLeetProfile.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/api/joinGroup/leave/[userI]/user/logout/route.js", "src/lib/useGetLeetProfile.js", "src/app/api/user/get-user/[userId]/route.js"],
   "exclude": ["node_modules"]
 }
