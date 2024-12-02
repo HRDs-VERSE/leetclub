@@ -2,17 +2,11 @@ import connectDB from "@/lib/connectDB";
 import User from "@/models/user.model";
 import { NextRequest, NextResponse } from "next/server";
 
-type Params = {
-    params: {
-        userId: string;
-    };
-};
-
-export const GET = async (req: NextRequest, { params }: Params) => {
+export const GET = async (req: NextRequest, { params }: { params: { userId: string } }) => {
     try {
-        connectDB();
-        
-        const { userId } = await params;
+        await connectDB();
+
+        const { userId } = params;
 
         if (!userId) {
             return NextResponse.json(
@@ -29,11 +23,13 @@ export const GET = async (req: NextRequest, { params }: Params) => {
                 { status: 404 }
             );
         }
+
         return NextResponse.json(
-            { message: "User Found successfull", user },
+            { message: "User found successfully", user },
             { status: 200 }
         );
     } catch (error) {
+        // Handle server errors
         return NextResponse.json(
             { error: 'An error occurred while fetching the user data' },
             { status: 500 }
