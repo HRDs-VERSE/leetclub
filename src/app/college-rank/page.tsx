@@ -5,16 +5,17 @@ import { GroupPerformance } from "@/components/group-performance"
 import { shallowEqual, useSelector } from 'react-redux'
 import useGroupAPI from '@/fetchAPI/useGroupAPI'
 import useFetchLeetCodePoints from '@/lib/useCalculateLeetCodePoin'
+import usePlatformAPI from '@/fetchAPI/usePlatformAPI'
 
 
 
 export default function CollegeCompetitionPage() {
-  const [colleges, setColleges] = useState<any>()
-
+  const { getLeetCodeGroup } = usePlatformAPI()
   const { getAllGroup } = useGroupAPI()
   const user = useSelector((state: any) => state.user.userData, shallowEqual)
-
-  const { sortedGroups, loading, error } = useFetchLeetCodePoints(colleges);
+  
+  const [colleges, setColleges] = useState<any>()
+  const [sortedGroups, setSortedGruops] = useState<any>();
 
 
   useEffect(() => {
@@ -26,6 +27,10 @@ export default function CollegeCompetitionPage() {
       }
       const data = await getAllGroup(getGroupData)
       setColleges(data.groups)
+      console.log(data.groups)
+      const groupData = await getLeetCodeGroup(data.groups)
+      setSortedGruops(groupData)
+
     }
     getleetGroup()
   }, [])

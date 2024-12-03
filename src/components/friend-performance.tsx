@@ -3,10 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 
 export function FriendPerformance({ profile, user }: any) {
-  const totalSolved = profile.totalSolved
-  const easy = profile.totalSubmissions[1].count
-  const medium = profile.totalSubmissions[2].count
-  const hard = profile.totalSubmissions[3].count
+  const totalSolved = profile[0].count
+  const easy = profile[1].count
+  const medium = profile[2].count
+  const hard = profile[3].count
 
   const totalPoints = easy * 5 + medium * 15 + hard * 20
 

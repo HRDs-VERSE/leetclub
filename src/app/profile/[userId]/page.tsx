@@ -32,6 +32,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import useGroupAPI from "@/fetchAPI/useGroupAPI"
+import GitHubHeatmap from "@/components/GitHubHeatmap"
 
 interface Platform {
   name: string
@@ -78,7 +79,7 @@ type FormValues = {
 export default function ProfilePage() {
   const router = useRouter()
   const { userId } = useParams();
-  const { getLeetCodeProfile } = usePlatformAPI()
+  const { getLeetCodeProfile, getGitHubHeatMap, newLeetCodeAPI } = usePlatformAPI()
   const { createGroup } = useGroupAPI()
   const stringUserId = userId as string
   const { getUser, toggelUser } = useUserAPI()
@@ -90,12 +91,14 @@ export default function ProfilePage() {
   const [leetCodeProfile, setLeetCodeProfile] = useState<any>()
   const [openAlert, setOpenAlert] = useState(false)
   const [openCreateGroup, setOpenCreateGroup] = useState(false)
+  const [gitHubContribution, setGitHubContribution] = useState()
+  const [gitTotalContribution, setGitTotalContribution] = useState<number>()
   const [groupForm, setGroupForm] = useState<FormValues>({
     name: "",
     tagLine: "",
     type: "" as 'collaborate' | 'university' | 'group',
   });
-  
+
 
   const handleTypeChange = (value: 'collaborate' | 'university' | 'group') => {
     setGroupForm((prevFormData) => ({
@@ -104,8 +107,9 @@ export default function ProfilePage() {
     }));
   };
 
+
   useEffect(() => {
-    if (userData?.newUserInfoDone === false){
+    if (userData?.newUserInfoDone === false) {
       console.log("user not done")
       setOpenAlert(true)
     }
@@ -147,17 +151,32 @@ export default function ProfilePage() {
   useEffect(() => {
     const getPlatformProfile = async () => {
       if (userData?.competitivePlatforms[0].platformName === "LeetCode") {
-        const data = await getLeetCodeProfile(userData?.competitivePlatforms[0].username)
-        setLeetCodeProfile(data)
+        const data = await newLeetCodeAPI(userData?.competitivePlatforms[0].username)
+        setLeetCodeProfile(data.matchedUser.submitStatsGlobal.acSubmissionNum)
         setProfileLoading(false)
       }
     }
 
     if (userData?._id) {
       getPlatformProfile()
+      handleGetGitHubContribution()
     }
 
   }, [userData])
+
+
+  const handleGetGitHubContribution = async () => {
+    const data = await getGitHubHeatMap(String(userData?.username))
+
+    const flattenedContributions: any = data?.contributionCalendar.weeks.flatMap((week: any) =>
+      week.contributionDays.map((day: any) => ({
+        date: day.date,
+        count: day.contributionCount
+      }))
+    );
+    setGitTotalContribution(data?.contributionCalendar.totalContributions)
+    setGitHubContribution(flattenedContributions)
+  }
 
   const handleToggelUser = async () => {
     try {
@@ -166,6 +185,7 @@ export default function ProfilePage() {
       console.error('Error toggling user:', error)
     }
   }
+
 
   return (
     <>
@@ -176,6 +196,11 @@ export default function ProfilePage() {
             <AvatarFallback>{userData?.username}</AvatarFallback>
           </Avatar>
           <h1 className="text-3xl font-bold">{userData?.username}</h1>
+        </div>
+        <div className="flex flex-col gap-2">
+          <h1>GitHub Contributions</h1>
+          <h2 className="text-[.9rem] text-neutral-300">{gitTotalContribution} contributions in the last year</h2>
+          <GitHubHeatmap contribution={gitHubContribution} />
         </div>
         <Button onClick={() => setOpenCreateGroup(prev => !prev)}>Create Group</Button>
         <div className="grid gap-6 grid-cols-1">
@@ -189,12 +214,12 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
                 <div className="text-xs text-muted-foreground mb-1">
-                  Problems Solved: {leetCodeProfile.totalSubmissions[0].count}
+                  Problems Solved: {leetCodeProfile[0].count}
                 </div>
                 <DifficultyBreakdown
-                  easy={leetCodeProfile.totalSubmissions[1].count}
-                  medium={leetCodeProfile.totalSubmissions[2].count}
-                  hard={leetCodeProfile.totalSubmissions[3].count}
+                  easy={leetCodeProfile[1].count}
+                  medium={leetCodeProfile[2].count}
+                  hard={leetCodeProfile[3].count}
                 />
               </CardContent>
             </Card>
@@ -212,6 +237,7 @@ export default function ProfilePage() {
               Fill in the details below to create a new group.
             </DialogDescription>
           </DialogHeader>
+          <h1>GitHub Contributions</h1>
           <div className="space-y-4">
             {/* Group Name Input */}
             <div>
@@ -313,7 +339,7 @@ export default function ProfilePage() {
                   Note: You can only join one of each type of group and create
                 </p>
                 <p className="text-sm text-gray-400 italic mt-2">
-                &quot;Understand! you better understand&quot;
+                  &quot;Understand! you better understand&quot;
                 </p>
               </div>
             </AlertDialogDescription>

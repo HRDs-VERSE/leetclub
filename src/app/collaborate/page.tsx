@@ -7,10 +7,12 @@ import GroupSearchResult from '@/components/GroupSearchResult'
 import useJoinGroupAPI from '@/fetchAPI/useJoinGroupAPI'
 import { shallowEqual, useSelector } from 'react-redux'
 import useGetLeetProfile from '@/lib/useGetLeetProfile'
+import usePlatformAPI from '@/fetchAPI/usePlatformAPI'
 
 
 export default function CollaboratePage() {
   const { getJoinGroup } = useJoinGroupAPI()
+  const { getCollaborateProfile } = usePlatformAPI()
   const user = useSelector((state: any) => state.user.userData, shallowEqual)
 
   const [newFriendName, setNewFriendName] = useState('')
@@ -21,7 +23,7 @@ export default function CollaboratePage() {
   const [group, setGroup] = useState<any>()
   const [joinedGroups, setJoinedGroups] = useState<any>()
   const [query, setQuery] = useState("")
-  const { leetCodeProfiles, loading } = useGetLeetProfile(joinedGroups);
+  const [leetCodeProfiles, setLeetCodeProfiles ] = useState<any>()
 
 
   useEffect(() => {
@@ -41,6 +43,10 @@ export default function CollaboratePage() {
 
         if (data.joinedGroups && data.joinedGroups.length > 0) {
           setJoinedGroups(data.joinedGroups[0].userDetails)
+
+          const profileData = await getCollaborateProfile(data.joinedGroups[0].userDetails)
+          setLeetCodeProfiles(profileData)
+
         } else {
           console.error("No joined groups found");
         }

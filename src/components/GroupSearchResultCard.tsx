@@ -1,7 +1,9 @@
+"use client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import useJoinGroupAPI from "@/fetchAPI/useJoinGroupAPI"
 import { Users } from 'lucide-react'
+import { useState } from "react"
 import { shallowEqual, useSelector } from "react-redux"
 
 interface GroupSearchResultCardProps {
@@ -16,6 +18,7 @@ interface GroupSearchResultCardProps {
 export function GroupSearchResultCard({ groupId, type, name, membersCount, tagLine, isUserInGroup }: GroupSearchResultCardProps) {
   const { joinGroup, leaveGroup } = useJoinGroupAPI()
   const user = useSelector((state: any) => state.user.userData, shallowEqual)
+  const [isleaveGroup, setIsLeaveGroup] = useState(!isUserInGroup)
 
   const handleJoin = async () => {
     const joinGroupData = {
@@ -26,6 +29,7 @@ export function GroupSearchResultCard({ groupId, type, name, membersCount, tagLi
 
     try {
       await joinGroup(joinGroupData)
+      setIsLeaveGroup(false)
     } catch (error) {
       console.error('Error joining group:', error)
     }
@@ -38,6 +42,7 @@ export function GroupSearchResultCard({ groupId, type, name, membersCount, tagLi
     }
     try {
       await leaveGroup(leaveGroupData)
+      setIsLeaveGroup(true)
     } catch (error) {
       console.error('Error leaving group:', error)
     }
@@ -64,7 +69,7 @@ export function GroupSearchResultCard({ groupId, type, name, membersCount, tagLi
         </p>
       </CardContent>
       <CardFooter>
-        {isUserInGroup ? (
+        {(isUserInGroup && !isleaveGroup) ? (
           <Button onClick={handleLeave} className="w-full ">Leave Group</Button>
         ) : (
           <Button onClick={handleJoin} className="w-full ">Join Group</Button>
