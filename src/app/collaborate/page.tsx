@@ -6,7 +6,6 @@ import { FriendPerformance } from "@/components/friend-performance"
 import GroupSearchResult from '@/components/GroupSearchResult'
 import useJoinGroupAPI from '@/fetchAPI/useJoinGroupAPI'
 import { shallowEqual, useSelector } from 'react-redux'
-import useGetLeetProfile from '@/lib/useGetLeetProfile'
 import usePlatformAPI from '@/fetchAPI/usePlatformAPI'
 
 
