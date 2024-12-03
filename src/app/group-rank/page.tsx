@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { GroupPerformance } from "@/components/group-performance"
 import useGroupAPI from '@/fetchAPI/useGroupAPI'
 import { shallowEqual, useSelector } from 'react-redux'
-import useFetchLeetCodePoints from '@/lib/useCalculateLeetCodePoin'
 import usePlatformAPI from '@/fetchAPI/usePlatformAPI'
 
 
