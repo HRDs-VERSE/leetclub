@@ -79,7 +79,7 @@ type FormValues = {
 export default function ProfilePage() {
   const router = useRouter()
   const { userId } = useParams();
-  const { getLeetCodeProfile, getGitHubHeatMap, newLeetCodeAPI } = usePlatformAPI()
+  const { getLeetCodeProfile, getGitHubHeatMap, newLeetCodeAPI, getLeetCodeHeatmap } = usePlatformAPI()
   const { createGroup } = useGroupAPI()
   const stringUserId = userId as string
   const { getUser, toggelUser } = useUserAPI()
@@ -92,6 +92,7 @@ export default function ProfilePage() {
   const [openAlert, setOpenAlert] = useState(false)
   const [openCreateGroup, setOpenCreateGroup] = useState(false)
   const [gitHubContribution, setGitHubContribution] = useState()
+  const [leetCodeContribution, setLeetCodeContribution] = useState<any>()
   const [gitTotalContribution, setGitTotalContribution] = useState<number>()
   const [groupForm, setGroupForm] = useState<FormValues>({
     name: "",
@@ -153,6 +154,30 @@ export default function ProfilePage() {
       if (userData?.competitivePlatforms[0].platformName === "LeetCode") {
         const data = await newLeetCodeAPI(userData?.competitivePlatforms[0].username)
         setLeetCodeProfile(data.matchedUser.submitStatsGlobal.acSubmissionNum)
+        const profile = await getLeetCodeHeatmap(userData?.competitivePlatforms[0].username)
+        const { submissionCalendar, ...otherData } = profile;
+
+
+        const formate = formateData(submissionCalendar)
+        const filledCalendar = makeAllDates()
+
+        const mergeBothDate = filledCalendar.filter(item =>
+          !formate.some(item2 => item2.date === item.date)
+        );
+
+        mergeBothDate.push(...formate);
+
+        mergeBothDate.sort((a, b) => {
+          const dateA: any = new Date(a.date.split("-").reverse().join("-"));
+          const dateB: any = new Date(b.date.split("-").reverse().join("-"));
+          return dateA - dateB;
+        });
+
+        setLeetCodeContribution({
+          ...otherData,
+          formate: mergeBothDate
+        })
+
         setProfileLoading(false)
       }
     }
@@ -164,6 +189,43 @@ export default function ProfilePage() {
 
   }, [userData])
 
+  const date = new Date();
+
+  const makeAllDates = () => {
+
+    const year = date.getFullYear();
+
+    const filledCalendar = [];
+
+    const firstDate = new Date(`${year}-01-01`);
+
+    for (let d = new Date(firstDate); d.getFullYear() === year; d.setDate(d.getDate() + 1)) {
+      const formattedDate = `${d.getDate().toString().padStart(2, '0')}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getFullYear()}`;
+      const data = {
+        date: formattedDate,
+        count: 0
+      }
+      filledCalendar.push(data);
+    }
+
+    return filledCalendar;
+
+  }
+
+
+  const formateData = (submissionCalendar: any) => {
+    const calendar = JSON.parse(submissionCalendar);
+
+    const formattedData = Object.entries(calendar).map(([timestamp, count]: any) => {
+      const date = new Date(timestamp * 1000);
+      const formattedDate = date.toLocaleDateString("en-GB").replace(/\//g, "-");
+
+      return { date: formattedDate, count };
+    });
+
+    return formattedData;
+
+  }
 
   const handleGetGitHubContribution = async () => {
     const data = await getGitHubHeatMap(String(userData?.username))
@@ -174,6 +236,7 @@ export default function ProfilePage() {
         count: day.contributionCount
       }))
     );
+
     setGitTotalContribution(data?.contributionCalendar.totalContributions)
     setGitHubContribution(flattenedContributions)
   }
@@ -201,6 +264,12 @@ export default function ProfilePage() {
           <h1>GitHub Contributions</h1>
           <h2 className="text-[.9rem] text-neutral-300">{gitTotalContribution} contributions in the last year</h2>
           <GitHubHeatmap contribution={gitHubContribution} />
+        </div>
+        <div className="flex flex-col gap-2">
+          <h1>LeetCode Contributions</h1>
+          <h2 className="text-[.9rem] text-neutral-300">{leetCodeContribution?.streak} Streak</h2>
+          <h2 className="text-[.9rem] text-neutral-300">{leetCodeContribution?.totalActiveDays} Total ActiveDays</h2>
+          <GitHubHeatmap contribution={leetCodeContribution?.formate} />
         </div>
         <Button onClick={() => setOpenCreateGroup(prev => !prev)}>Create Group</Button>
         <div className="grid gap-6 grid-cols-1">

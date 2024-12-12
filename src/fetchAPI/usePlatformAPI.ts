@@ -22,7 +22,7 @@ const usePlatformAPI = () => {
 
     try {
       const response = await fetch(`/api/plateform?username=${username}`)
-        
+
       if (!response.ok) {
         console.error(`HTTP error! Status: ${response.status}`);
       }
@@ -85,21 +85,39 @@ const usePlatformAPI = () => {
   }
 
   const getLeetCodeGroup = async (groups: any) => {
-      try {
-        const response = await fetch('/api/plateform/get-group', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ groups }),
-        });
+    try {
+      const response = await fetch('/api/plateform/get-group', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ groups }),
+      });
 
-        const data = await response.json();
-        return data.data;
-  
-      } catch (error) {
-        console.error('Error fetching LeetCode data:', error);
-      }
+      const data = await response.json();
+      return data.data;
+
+    } catch (error) {
+      console.error('Error fetching LeetCode data:', error);
+    }
+  }
+
+  const getLeetCodeHeatmap = async (username: string) => {
+    try {
+      const response = await fetch('/api/plateform/get-leet-heatmap', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({username}),
+      });
+
+      const data = await response.json();
+      return data.profile;
+
+    } catch (error) {
+      console.error('Error fetching LeetCode data:', error);
+    }
   }
 
 
@@ -109,7 +127,8 @@ const usePlatformAPI = () => {
     getGitHubHeatMap,
     newLeetCodeAPI,
     getCollaborateProfile,
-    getLeetCodeGroup
+    getLeetCodeGroup,
+    getLeetCodeHeatmap
   }
 }
 
