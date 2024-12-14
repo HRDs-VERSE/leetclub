@@ -66,6 +66,75 @@ const usePlatformAPI = () => {
     return data.data?.user?.contributionsCollection;
   }
 
+  const getGitHubCommits = async (username: string, privacy: boolean) => {
+    const variables: any = {
+      username: username,
+    };
+  
+    if (privacy) {
+      variables.privacy = "PUBLIC"; 
+    }
+  
+    const query = `query ($username: String! ${privacy ? ", $privacy: RepositoryPrivacy!" : ""}) {
+      user(login: $username) {
+        repositories(first: 100, ownerAffiliations: [OWNER, COLLABORATOR] ${
+          privacy ? ", privacy: $privacy" : ""
+        }) {
+          nodes {
+            name
+            isPrivate
+            owner {
+              login
+            }
+            refs(first: 1, refPrefix: "refs/heads/") {
+              nodes {
+                target {
+                  ... on Commit {
+                    history(first: 100) {
+                      totalCount
+                      edges {
+                        node {
+                          committedDate
+                          message
+                          author {
+                            name
+                            email
+                            user {
+                              login
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }`;
+  
+  
+    const response = await fetch('https://api.github.com/graphql', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query,
+        variables,
+      }),
+    });
+  
+    const data = await response.json();
+    console.log(data.data.user.repositories.nodes);
+    return data.data.user.repositories.nodes;
+
+  };
+  
+
   const getCollaborateProfile = async (userData: any) => {
     try {
       const response = await fetch('/api/plateform/get-collaborate', {
@@ -109,7 +178,7 @@ const usePlatformAPI = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({username}),
+        body: JSON.stringify({ username }),
       });
 
       const data = await response.json();
@@ -125,6 +194,7 @@ const usePlatformAPI = () => {
   return {
     getLeetCodeProfile,
     getGitHubHeatMap,
+    getGitHubCommits,
     newLeetCodeAPI,
     getCollaborateProfile,
     getLeetCodeGroup,

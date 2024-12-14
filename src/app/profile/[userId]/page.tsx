@@ -79,7 +79,7 @@ type FormValues = {
 export default function ProfilePage() {
   const router = useRouter()
   const { userId } = useParams();
-  const { getLeetCodeProfile, getGitHubHeatMap, newLeetCodeAPI, getLeetCodeHeatmap } = usePlatformAPI()
+  const { getLeetCodeProfile, getGitHubHeatMap, newLeetCodeAPI, getLeetCodeHeatmap, getGitHubCommits } = usePlatformAPI()
   const { createGroup } = useGroupAPI()
   const stringUserId = userId as string
   const { getUser, toggelUser } = useUserAPI()
@@ -92,6 +92,7 @@ export default function ProfilePage() {
   const [openAlert, setOpenAlert] = useState(false)
   const [openCreateGroup, setOpenCreateGroup] = useState(false)
   const [gitHubContribution, setGitHubContribution] = useState()
+  const [gitHubCommits, setGitHubCommits] = useState()
   const [leetCodeContribution, setLeetCodeContribution] = useState<any>()
   const [gitTotalContribution, setGitTotalContribution] = useState<number>()
   const [groupForm, setGroupForm] = useState<FormValues>({
@@ -154,9 +155,9 @@ export default function ProfilePage() {
       if (userData?.competitivePlatforms[0].platformName === "LeetCode") {
         const data = await newLeetCodeAPI(userData?.competitivePlatforms[0].username)
         setLeetCodeProfile(data.matchedUser.submitStatsGlobal.acSubmissionNum)
+
         const profile = await getLeetCodeHeatmap(userData?.competitivePlatforms[0].username)
         const { submissionCalendar, ...otherData } = profile;
-
 
         const formate = formateData(submissionCalendar)
         const filledCalendar = makeAllDates()
@@ -192,11 +193,8 @@ export default function ProfilePage() {
   const date = new Date();
 
   const makeAllDates = () => {
-
     const year = date.getFullYear();
-
     const filledCalendar = [];
-
     const firstDate = new Date(`${year}-01-01`);
 
     for (let d = new Date(firstDate); d.getFullYear() === year; d.setDate(d.getDate() + 1)) {
@@ -229,6 +227,8 @@ export default function ProfilePage() {
 
   const handleGetGitHubContribution = async () => {
     const data = await getGitHubHeatMap(String(userData?.username))
+    const commits = await getGitHubCommits(String(userData?.username), false)
+    setGitHubCommits(commits)
 
     const flattenedContributions: any = data?.contributionCalendar.weeks.flatMap((week: any) =>
       week.contributionDays.map((day: any) => ({
