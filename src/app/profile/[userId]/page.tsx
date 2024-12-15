@@ -33,6 +33,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import useGroupAPI from "@/fetchAPI/useGroupAPI"
 import GitHubHeatmap from "@/components/GitHubHeatmap"
+import GitHubCommits from "@/components/GitHubCommits"
 
 interface Platform {
   name: string
@@ -79,7 +80,7 @@ type FormValues = {
 export default function ProfilePage() {
   const router = useRouter()
   const { userId } = useParams();
-  const { getLeetCodeProfile, getGitHubHeatMap, newLeetCodeAPI, getLeetCodeHeatmap, getGitHubCommits } = usePlatformAPI()
+  const { getLeetCodeProfile, getGitHubHeatMap, newLeetCodeAPI, getLeetCodeHeatmap } = usePlatformAPI()
   const { createGroup } = useGroupAPI()
   const stringUserId = userId as string
   const { getUser, toggelUser } = useUserAPI()
@@ -92,7 +93,6 @@ export default function ProfilePage() {
   const [openAlert, setOpenAlert] = useState(false)
   const [openCreateGroup, setOpenCreateGroup] = useState(false)
   const [gitHubContribution, setGitHubContribution] = useState()
-  const [gitHubCommits, setGitHubCommits] = useState()
   const [leetCodeContribution, setLeetCodeContribution] = useState<any>()
   const [gitTotalContribution, setGitTotalContribution] = useState<number>()
   const [groupForm, setGroupForm] = useState<FormValues>({
@@ -227,8 +227,6 @@ export default function ProfilePage() {
 
   const handleGetGitHubContribution = async () => {
     const data = await getGitHubHeatMap(String(userData?.username))
-    const commits = await getGitHubCommits(String(userData?.username), false)
-    setGitHubCommits(commits)
 
     const flattenedContributions: any = data?.contributionCalendar.weeks.flatMap((week: any) =>
       week.contributionDays.map((day: any) => ({
@@ -264,6 +262,7 @@ export default function ProfilePage() {
           <h1>GitHub Contributions</h1>
           <h2 className="text-[.9rem] text-neutral-300">{gitTotalContribution} contributions in the last year</h2>
           <GitHubHeatmap contribution={gitHubContribution} />
+          <GitHubCommits username={userData?.username}/>
         </div>
         <div className="flex flex-col gap-2">
           <h1>LeetCode Contributions</h1>
