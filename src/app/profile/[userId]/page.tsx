@@ -34,6 +34,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import useGroupAPI from "@/fetchAPI/useGroupAPI"
 import GitHubHeatmap from "@/components/GitHubHeatmap"
 import GitHubCommits from "@/components/GitHubCommits"
+import LeetCodeQuestions from "@/components/LeetCodeQuestions"
 
 interface Platform {
   name: string
@@ -269,6 +270,7 @@ export default function ProfilePage() {
           <h2 className="text-[.9rem] text-neutral-300">{leetCodeContribution?.streak} Streak</h2>
           <h2 className="text-[.9rem] text-neutral-300">{leetCodeContribution?.totalActiveDays} Total ActiveDays</h2>
           <GitHubHeatmap contribution={leetCodeContribution?.formate} />
+          <LeetCodeQuestions username={String(userData?.competitivePlatforms[0].username)}/>
         </div>
         <Button onClick={() => setOpenCreateGroup(prev => !prev)}>Create Group</Button>
         <div className="grid gap-6 grid-cols-1">

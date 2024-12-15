@@ -70,16 +70,15 @@ const usePlatformAPI = () => {
     const variables: any = {
       username: username,
     };
-  
+
     if (privacy) {
-      variables.privacy = "PUBLIC"; 
+      variables.privacy = "PUBLIC";
     }
-  
+
     const query = `query ($username: String! ${privacy ? ", $privacy: RepositoryPrivacy!" : ""}) {
       user(login: $username) {
-        repositories(first: 100, ownerAffiliations: [OWNER, COLLABORATOR] ${
-          privacy ? ", privacy: $privacy" : ""
-        }) {
+        repositories(first: 100, ownerAffiliations: [OWNER, COLLABORATOR] ${privacy ? ", privacy: $privacy" : ""
+      }) {
           nodes {
             name
             isPrivate
@@ -114,8 +113,8 @@ const usePlatformAPI = () => {
         }
       }
     }`;
-  
-  
+
+
     const response = await fetch('https://api.github.com/graphql', {
       method: 'POST',
       headers: {
@@ -127,13 +126,11 @@ const usePlatformAPI = () => {
         variables,
       }),
     });
-  
+
     const data = await response.json();
-    console.log(data.data.user.repositories.nodes);
     return data.data.user.repositories.nodes;
 
   };
-  
 
   const getCollaborateProfile = async (userData: any) => {
     try {
@@ -189,6 +186,24 @@ const usePlatformAPI = () => {
     }
   }
 
+  const getLeetCodeQuestionSolved = async (username: string) => {
+    try {
+      const response = await fetch('/api/plateform/get-leet-user-questions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username }),
+      });
+
+      const data = await response.json();
+      return data.data;
+      
+    } catch (error) {
+      console.error("Error fetching LeetCode data:", error);
+    }
+  };  
+  
 
 
   return {
@@ -198,7 +213,8 @@ const usePlatformAPI = () => {
     newLeetCodeAPI,
     getCollaborateProfile,
     getLeetCodeGroup,
-    getLeetCodeHeatmap
+    getLeetCodeHeatmap,
+    getLeetCodeQuestionSolved
   }
 }
 

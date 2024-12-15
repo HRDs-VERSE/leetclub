@@ -9,6 +9,9 @@ const GitHubCommits = ({ username }: any) => {
     const [gitHubCommits, setGitHubCommits] = useState<any>()
 
     const handleGetCommits = async () => {
+        if (!username) return
+        if (gitHubCommits) return
+        
         const commits = await getGitHubCommits(String(username), false)
         setGitHubCommits(commits)
     }
