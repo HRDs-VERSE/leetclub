@@ -7,6 +7,7 @@ import GroupSearchResult from '@/components/GroupSearchResult'
 import useJoinGroupAPI from '@/fetchAPI/useJoinGroupAPI'
 import { shallowEqual, useSelector } from 'react-redux'
 import usePlatformAPI from '@/fetchAPI/usePlatformAPI'
+import GroupPerformanceSkeleton from '@/components/Skeleton/GroupPerformanceSkeleton '
 
 
 export default function CollaboratePage() {
@@ -18,11 +19,9 @@ export default function CollaboratePage() {
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
   const [hasMore, setHasMore] = useState(true)
-  const [friendsProfile, setFriendsProfile] = useState<any>()
   const [group, setGroup] = useState<any>()
-  const [joinedGroups, setJoinedGroups] = useState<any>()
-  const [query, setQuery] = useState("")
-  const [leetCodeProfiles, setLeetCodeProfiles ] = useState<any>()
+  // const [joinedGroups, setJoinedGroups] = useState<any>()
+  const [leetCodeProfiles, setLeetCodeProfiles] = useState<any>()
 
 
   useEffect(() => {
@@ -41,8 +40,7 @@ export default function CollaboratePage() {
         setGroup(data.joinedGroups[0].groupDetails)
 
         if (data.joinedGroups && data.joinedGroups.length > 0) {
-          setJoinedGroups(data.joinedGroups[0].userDetails)
-
+          // setJoinedGroups(data.joinedGroups[0].userDetails)
           const profileData = await getCollaborateProfile(data.joinedGroups[0].userDetails)
           setLeetCodeProfiles(profileData)
 
@@ -55,31 +53,20 @@ export default function CollaboratePage() {
     };
 
     fetchFriends();
-  }, [user]);
+  }, [user?._id]);
 
 
   return (
     <>
-      <div className="container mx-auto p-4 space-y-6 max-w-[45rem] m-auto">
-        <h1 className="text-2xl font-bold mb-6">Search Groups</h1>
-        <Input
-          type="text"
-          placeholder="Search for groups..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="mb-6"
-        />
-        {group &&
-          <>
-            <h1 className="text-3xl font-bold">{group[0].name}</h1>
-            <h2 className="font-bold text-neutral-600">{group[0].tagLine}</h2>
-          </>
-        }
-
-        {query &&
-          <GroupSearchResult query={query} />
-        }
-        {!query &&
+      {!group && <GroupPerformanceSkeleton />}
+      {group &&
+        <div className="container mx-auto p-4 space-y-6 max-w-[45rem] m-auto">
+          {group &&
+            <div className="flex justify-between items-center">
+              <h1 className="text-3xl font-bold">{group[0].name}</h1>
+              <h2 className="font-bold text-neutral-600">{group[0].tagLine}</h2>
+            </div>
+          }
           <div className="grid gap-6 grid-cols-1">
             {leetCodeProfiles?.map((friend: any, index: number) => (
               <FriendPerformance
@@ -89,8 +76,8 @@ export default function CollaboratePage() {
               />
             ))}
           </div>
-        }
-      </div>
+        </div>
+      }
     </>
   )
 }
