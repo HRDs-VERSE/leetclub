@@ -9,6 +9,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { shallowEqual, useSelector } from "react-redux"
 import useUserAPI from "@/fetchAPI/useUserAPI"
 import LogoutDialog from "./LogoutDiaload"
+import { Search } from "lucide-react"
+import SearchModal from "./SearchModal"
 
 const routes = [
     { href: "/collaborate", label: "Collaborate" },
@@ -24,6 +26,7 @@ const Navbar = () => {
 
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [openLogout, setOpenLogout] = useState(false)
+    const [searchEnable, setSearchEnable] = useState(false)
 
 
     useEffect(() => {
@@ -51,7 +54,15 @@ const Navbar = () => {
                         <div className="flex items-center">
                             {isAuthenticated ? (
                                 <>
-                                    <div className="ml-6 flex sm:space-x-8">
+                                    <div className="ml-6 flex items-center gap-4">
+
+                                        <Search
+                                            className={`text-neutral-500 hover:text-neutral-300`}
+                                            onClick={() => {
+                                                setSearchEnable(prev => !prev)
+                                            }}
+                                        />
+
                                         {routes.map((route) => (
                                             <Link
                                                 key={route.href}
@@ -97,6 +108,7 @@ const Navbar = () => {
                 <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-blue-700 to-transparent h-[1px] w-full" />
             </nav>
             <LogoutDialog open={openLogout} setOpen={setOpenLogout} />
+            <SearchModal open={searchEnable} setOpen={setSearchEnable} />
         </>
 
     )
