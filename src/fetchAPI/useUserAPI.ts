@@ -160,6 +160,22 @@ const useUserAPI = () => {
         }
     }
 
+    const searchUser = async (query: string, page: number, limit: number) => {
+        try {
+            const response = await fetch(`/api/user/search?query=${query}&page=${page}&limit=${limit}`);
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                return { message: data.message };
+            }
+
+            return data;
+        } catch (error) {
+            return { message: "An error occurred while searching the user. Please try again.", error };
+        }
+    }
+
 
     return {
         updateSession,
@@ -169,7 +185,8 @@ const useUserAPI = () => {
         updateUser,
         logout,
         deleteUser,
-        toggelUser
+        toggelUser,
+        searchUser
     }
 };
 
