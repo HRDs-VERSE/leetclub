@@ -16,6 +16,7 @@ interface PlatformData {
 
 const initialPlatforms: PlatformData[] = [
   { platformName: 'LeetCode', username: '' },
+  { platformName: 'GitHub', username: '' },
   { platformName: 'HackerRank', username: '' },
   { platformName: 'CodeForces', username: '' },
 ]
@@ -36,7 +37,7 @@ const UpdateProfile = () => {
 
 
   useEffect(() => {
-    if (user?._id && user.competitivePlatforms) {
+    if (user?._id && user.competitivePlatforms?.length) {
       setPlatforms(user.competitivePlatforms.map((platform: PlatformData) => ({
         platformName: platform.platformName,
         username: platform.username || ''
@@ -63,7 +64,7 @@ const UpdateProfile = () => {
               <Input
                 id={`username-${index}`}
                 value={platform.username}
-                disabled={platform.platformName !== 'LeetCode'}
+                disabled={platform.platformName !== 'LeetCode' && platform.platformName !== "GitHub"}
                 onChange={(e) => handleUsernameChange(index, e.target.value)}
                 placeholder={`Enter your ${platform.platformName} username`}
               />
