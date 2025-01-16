@@ -5,6 +5,7 @@ import { GroupPerformance } from "@/components/group-performance"
 import { shallowEqual, useSelector } from 'react-redux'
 import useGroupAPI from '@/fetchAPI/useGroupAPI'
 import usePlatformAPI from '@/fetchAPI/usePlatformAPI'
+import { CardSkeleton } from '@/components/Skeleton/CardSkeleton'
 
 
 
@@ -12,7 +13,7 @@ export default function CollegeCompetitionPage() {
   const { getLeetCodeGroup } = usePlatformAPI()
   const { getAllGroup } = useGroupAPI()
   const user = useSelector((state: any) => state.user.userData, shallowEqual)
-  
+
   const [colleges, setColleges] = useState<any>()
   const [sortedGroups, setSortedGruops] = useState<any>();
 
@@ -37,26 +38,36 @@ export default function CollegeCompetitionPage() {
 
   return (
     <div className="container mx-auto p-4 space-y-6 max-w-[45rem] m-auto">
-      <h1 className="text-3xl font-bold">College Rank</h1>
-
-      <div className="grid gap-6 grid-cols-1">
-        {!colleges?.length &&
-          <div className='w-full flex justify-center'>
-            No University here
+      {!sortedGroups &&
+        <>
+          <CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
+        </>
+      }
+      {sortedGroups &&
+        <>
+          <h1 className="text-3xl font-bold">College Rank</h1>
+          <div className="grid gap-6 grid-cols-1">
+            {!colleges?.length &&
+              <div className='w-full flex justify-center'>
+                No University here
+              </div>
+            }
+            {sortedGroups?.map((college: any) => (
+              <GroupPerformance
+                key={college._id}
+                groupData={college}
+                totalPoints={college.totalPoints}
+                totalEasy={college.easyCount}
+                totalMedium={college.mediumCount}
+                totalHard={college.hardCount}
+                totalQuestions={college.totalQuestions}
+              />
+            ))}
           </div>
-        }
-        {sortedGroups?.map((college: any) => (
-          <GroupPerformance
-            key={college._id}
-            groupData={college}
-            totalPoints={college.totalPoints}
-            totalEasy={college.easyCount}
-            totalMedium={college.mediumCount}
-            totalHard={college.hardCount}
-            totalQuestions={college.totalQuestions}
-          />
-        ))}
-      </div>
+        </>
+      }
     </div>
   )
 }
