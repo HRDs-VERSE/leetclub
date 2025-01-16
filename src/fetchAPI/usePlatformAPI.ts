@@ -62,7 +62,7 @@ const usePlatformAPI = () => {
   const getGitHubCommits = async (username: string, privacy: boolean, loadMore: boolean = false) => {
     try {
       // Store cursor in hook's local storage to maintain state between calls
-      let cursor = loadMore ? localStorage.getItem(`github-cursor-${username}`) : null;
+      const cursor = loadMore ? localStorage.getItem(`github-cursor-${username}`) : null;
 
       const response = await fetch('/api/plateform/get-github-commit', {
         method: 'POST',
