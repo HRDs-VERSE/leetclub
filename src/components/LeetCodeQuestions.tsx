@@ -79,7 +79,7 @@ const LeetCodeQuestions = ({ username }: any) => {
                     </AccordionTrigger>
                     <AccordionContent className="mt-[2rem]">
                         {["Hard", "Medium", "Easy"].map((difficulty) => (
-                            <Accordion key={difficulty} type="single" collapsible>
+                            <Accordion key={difficulty} type="single" collapsible className="hover:bg-neutral-900 px-2 rounded-md">
                                 <AccordionItem value={difficulty} className="border-none">
                                     <AccordionTrigger>
                                         <div className="flex gap-[2rem]">{difficulty}</div>

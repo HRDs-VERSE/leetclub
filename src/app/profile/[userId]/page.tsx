@@ -35,6 +35,8 @@ import useGroupAPI from "@/fetchAPI/useGroupAPI"
 import GitHubHeatmap from "@/components/GitHubHeatmap"
 import GitHubCommits from "@/components/GitHubCommits"
 import LeetCodeQuestions from "@/components/LeetCodeQuestions"
+import { User } from "lucide-react"
+import { UserProfileSkeleton } from "@/components/Skeleton/UserProfileSkeleton"
 
 interface Platform {
   name: string
@@ -91,6 +93,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [profileLoading, setProfileLoading] = useState(true)
   const [leetCodeProfile, setLeetCodeProfile] = useState<any>()
+  const [leetCodeUsername, setLeetCodeUsername] = useState<string>()
   const [openAlert, setOpenAlert] = useState(false)
   const [openCreateGroup, setOpenCreateGroup] = useState(false)
   const [gitHubContribution, setGitHubContribution] = useState()
@@ -112,11 +115,11 @@ export default function ProfilePage() {
 
 
   useEffect(() => {
+    if(userId != user?._id) return
     if (userData?.newUserInfoDone === false) {
-      console.log("user not done")
       setOpenAlert(true)
     }
-  }, [userData])
+  }, [userData, user?._id])
 
   const handleChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -153,7 +156,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const getPlatformProfile = async () => {
-      if (userData?.competitivePlatforms[0].platformName === "LeetCode") {
+      if (userData?.competitivePlatforms[0]?.platformName === "LeetCode") {
         const data = await newLeetCodeAPI(userData?.competitivePlatforms[0].username)
         setLeetCodeProfile(data.matchedUser.submitStatsGlobal.acSubmissionNum)
 
@@ -248,179 +251,193 @@ export default function ProfilePage() {
     }
   }
 
+  useEffect(() => {
+    if (userData) {
+      const leetCodeUsername = userData?.competitivePlatforms.filter((platform) => platform.platformName === "LeetCode")
+      setLeetCodeUsername(leetCodeUsername[0]?.username)
+    }
+  })
+
 
   return (
     <>
-      <div className="container mx-auto p-4 space-y-6 max-w-[45rem] m-auto">
-        <div className="flex items-center space-x-4">
-          <Avatar className="w-20 h-20">
-            <AvatarImage src={userData?.avatar} alt={userData?.username} />
-            <AvatarFallback>{userData?.username}</AvatarFallback>
-          </Avatar>
-          <h1 className="text-3xl font-bold">{userData?.username}</h1>
-        </div>
-        <div className="flex flex-col gap-2">
-          <h1>GitHub Contributions</h1>
-          <h2 className="text-[.9rem] text-neutral-300">{gitTotalContribution} contributions in the last year</h2>
-          <GitHubHeatmap contribution={gitHubContribution} />
-          <GitHubCommits username={userData?.username}/>
-        </div>
-        <div className="flex flex-col gap-2">
-          <h1>LeetCode Contributions</h1>
-          <h2 className="text-[.9rem] text-neutral-300">{leetCodeContribution?.streak} Streak</h2>
-          <h2 className="text-[.9rem] text-neutral-300">{leetCodeContribution?.totalActiveDays} Total ActiveDays</h2>
-          <GitHubHeatmap contribution={leetCodeContribution?.formate} />
-          <LeetCodeQuestions username={String(userData?.competitivePlatforms[0].username)}/>
-        </div>
-        <Button onClick={() => setOpenCreateGroup(prev => !prev)}>Create Group</Button>
-        <div className="grid gap-6 grid-cols-1">
-          {leetCodeProfile &&
-            <Card >
-              <CardHeader>
-                <CardTitle className="flex justify-between items-center">
-                  <span>LeetCode</span>
-                  <span className="text-sm font-normal">Rank: {leetCodeProfile.ranking}</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-xs text-muted-foreground mb-1">
-                  Problems Solved: {leetCodeProfile[0].count}
+      {(!userData && loading) && <UserProfileSkeleton />}
+      {(userData && !loading) &&
+        <>
+          <div className="container mx-auto p-4 space-y-6 max-w-[45rem] m-auto">
+            <div className="flex items-center space-x-4">
+              <Avatar className="w-20 h-20">
+                <AvatarImage src={userData?.avatar} alt={userData?.username} />
+                <AvatarFallback>{userData?.username}</AvatarFallback>
+              </Avatar>
+              <h1 className="text-3xl font-bold">{userData?.username}</h1>
+            </div>
+            <Button onClick={() => setOpenCreateGroup(prev => !prev)}>Create Group</Button>
+            <div className="flex flex-col gap-2">
+              <h1>GitHub Contributions</h1>
+              <h2 className="text-[.9rem] text-neutral-300">{gitTotalContribution} contributions in the last year</h2>
+              <GitHubHeatmap contribution={gitHubContribution} />
+              <GitHubCommits username={String(userData?.username)} />
+            </div>
+            {leetCodeUsername &&
+              <div className="flex flex-col gap-2">
+                <h1>LeetCode Contributions</h1>
+                <div className="flex gap-2">
+                  <h2 className="text-[.9rem] text-neutral-300">{leetCodeContribution?.streak} Streak</h2>
+                  <h2 className="text-[.9rem] text-neutral-300">{leetCodeContribution?.totalActiveDays} Total ActiveDays</h2>
                 </div>
-                <DifficultyBreakdown
-                  easy={leetCodeProfile[1].count}
-                  medium={leetCodeProfile[2].count}
-                  hard={leetCodeProfile[3].count}
-                />
-              </CardContent>
-            </Card>
-          }
-          {(!leetCodeProfile && !profileLoading && !loading) &&
-            <Button onClick={() => router.push("/profile/update")}>Add Competitive Profile Username</Button>
-          }
-        </div>
-      </div>
-      <Dialog open={openCreateGroup} onOpenChange={setOpenCreateGroup}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create a New Group</DialogTitle>
-            <DialogDescription>
-              Fill in the details below to create a new group.
-            </DialogDescription>
-          </DialogHeader>
-          <h1>GitHub Contributions</h1>
-          <div className="space-y-4">
-            {/* Group Name Input */}
-            <div>
-              <Label htmlFor="groupName" className="block text-sm font-medium ">
-                Group Name
-              </Label>
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                onChange={handleChanges}
-                required
-                className="mt-1 block w-full rounded-md sm:text-sm"
-                placeholder="Enter group name"
-              />
-            </div>
-            {/* Group Description Input */}
-            <div>
-              <Label htmlFor="description" className="block text-sm font-medium ">
-                Tag Line
-              </Label>
-              <Input
-                id="tagLine"
-                name="tagLine"
-                onChange={handleChanges}
-                required
-                className="mt-1 block w-full rounded-md shadow-sm sm:text-sm"
-                placeholder="Enter Group Tag Line"
-              />
-            </div>
-            {/* Group Type Select */}
-            <div>
-              <Label htmlFor="type" className="block text-sm font-medium ">
-                Group Type
-              </Label>
-              <Select onValueChange={(value: 'collaborate' | 'university' | 'group') => handleTypeChange(value)}>
-                <SelectTrigger className="rounded">
-                  <SelectValue placeholder={"Select Group Type"} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={"collaborate"}>Collaborate</SelectItem>
-                  <SelectItem value={"group"}>Group</SelectItem>
-                  <SelectItem value={"university"}>University</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="mt-6 flex justify-end">
-            {/* Cancel Button */}
-            <button
-              type="button"
-              onClick={() => setOpenCreateGroup(false)}
-              className="mr-3 inline-flex justify-center rounded-md border text-black border-gray-300 bg-white px-4 py-2 text-sm font-medium  shadow-sm hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            {/* Submit Button */}
-            <button
-              onClick={() => handleCreateGroup()}
-              className="inline-flex justify-center rounded-md border border-transparent bg-white px-4 py-2 text-sm font-medium text-black shadow-sm focus:ring-offset-2"
-            >
-              Create Group
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
-      <AlertDialog open={openAlert} onOpenChange={setOpenAlert}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Go through</AlertDialogTitle>
-            <AlertDialogDescription>
-              <div className="flex flex-col gap-4 text-white">
-                <h1 className="text-2xl font-bold">Welcome &apos; {user?.username}!</h1>
-                <p className="text-sm text-gray-300">
-                  Explore the three types of groups you can create and join:
-                </p>
-                <div className="mt-2">
-                  <div className="mb-2">
-                    <h2 className="text-lg font-semibold text-white">Collaborate</h2>
-                    <p className="text-sm text-gray-300">
-                      Work with friends to enhance each other&lsquo;s performance.
-                    </p>
-                  </div>
-                  <div className="mb-2">
-                    <h2 className="text-lg font-semibold text-white">Group</h2>
-                    <p className="text-sm text-gray-300">
-                      Track and compare your ranks in group leaderboards.
-                    </p>
-                  </div>
-                  <div className="mb-2">
-                    <h2 className="text-lg font-semibold text-white">University</h2>
-                    <p className="text-sm text-gray-300">
-                      See how you rank in your university&lsquo;s leaderboard.
-                    </p>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-300">
-                  Note: You can only join one of each type of group and create
-                </p>
-                <p className="text-sm text-gray-400 italic mt-2">
-                  &quot;Understand! you better understand&quot;
-                </p>
+                <GitHubHeatmap contribution={leetCodeContribution?.formate} />
+                <LeetCodeQuestions username={String(userData?.competitivePlatforms[0]?.username)} />
               </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => handleToggelUser()}>Continue</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            }
+            <div className="grid gap-6 grid-cols-1">
+              {leetCodeProfile &&
+                <Card >
+                  <CardHeader>
+                    <CardTitle className="flex justify-between items-center">
+                      <span>LeetCode</span>
+                      <span className="text-sm font-normal">Rank: {leetCodeProfile.ranking}</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-xs text-muted-foreground mb-1">
+                      Problems Solved: {leetCodeProfile[0].count}
+                    </div>
+                    <DifficultyBreakdown
+                      easy={leetCodeProfile[1].count}
+                      medium={leetCodeProfile[2].count}
+                      hard={leetCodeProfile[3].count}
+                    />
+                  </CardContent>
+                </Card>
+              }
+              {(!leetCodeProfile && !profileLoading && !loading) &&
+                <Button onClick={() => router.push("/profile/update")}>Add Competitive Profile Username</Button>
+              }
+            </div>
+          </div>
+          <Dialog open={openCreateGroup} onOpenChange={setOpenCreateGroup}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create a New Group</DialogTitle>
+                <DialogDescription>
+                  Fill in the details below to create a new group.
+                </DialogDescription>
+              </DialogHeader>
+              <h1>GitHub Contributions</h1>
+              <div className="space-y-4">
+                {/* Group Name Input */}
+                <div>
+                  <Label htmlFor="groupName" className="block text-sm font-medium ">
+                    Group Name
+                  </Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    type="text"
+                    onChange={handleChanges}
+                    required
+                    className="mt-1 block w-full rounded-md sm:text-sm"
+                    placeholder="Enter group name"
+                  />
+                </div>
+                {/* Group Description Input */}
+                <div>
+                  <Label htmlFor="description" className="block text-sm font-medium ">
+                    Tag Line
+                  </Label>
+                  <Input
+                    id="tagLine"
+                    name="tagLine"
+                    onChange={handleChanges}
+                    required
+                    className="mt-1 block w-full rounded-md shadow-sm sm:text-sm"
+                    placeholder="Enter Group Tag Line"
+                  />
+                </div>
+                {/* Group Type Select */}
+                <div>
+                  <Label htmlFor="type" className="block text-sm font-medium ">
+                    Group Type
+                  </Label>
+                  <Select onValueChange={(value: 'collaborate' | 'university' | 'group') => handleTypeChange(value)}>
+                    <SelectTrigger className="rounded">
+                      <SelectValue placeholder={"Select Group Type"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={"collaborate"}>Collaborate</SelectItem>
+                      <SelectItem value={"group"}>Group</SelectItem>
+                      <SelectItem value={"university"}>University</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-
+              <div className="mt-6 flex justify-end">
+                {/* Cancel Button */}
+                <button
+                  type="button"
+                  onClick={() => setOpenCreateGroup(false)}
+                  className="mr-3 inline-flex justify-center rounded-md border text-black border-gray-300 bg-white px-4 py-2 text-sm font-medium  shadow-sm hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                {/* Submit Button */}
+                <button
+                  onClick={() => handleCreateGroup()}
+                  className="inline-flex justify-center rounded-md border border-transparent bg-white px-4 py-2 text-sm font-medium text-black shadow-sm focus:ring-offset-2"
+                >
+                  Create Group
+                </button>
+              </div>
+            </DialogContent>
+          </Dialog>
+          <AlertDialog open={openAlert} onOpenChange={setOpenAlert}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Go through</AlertDialogTitle>
+                <AlertDialogDescription>
+                  <div className="flex flex-col gap-4 text-white">
+                    <h1 className="text-2xl font-bold">Welcome &apos; {userData?.username}!</h1>
+                    <p className="text-sm text-gray-300">
+                      Explore the three types of groups you can create and join:
+                    </p>
+                    <div className="mt-2">
+                      <div className="mb-2">
+                        <h2 className="text-lg font-semibold text-white">Collaborate</h2>
+                        <p className="text-sm text-gray-300">
+                          Work with friends to enhance each other&lsquo;s performance.
+                        </p>
+                      </div>
+                      <div className="mb-2">
+                        <h2 className="text-lg font-semibold text-white">Group</h2>
+                        <p className="text-sm text-gray-300">
+                          Track and compare your ranks in group leaderboards.
+                        </p>
+                      </div>
+                      <div className="mb-2">
+                        <h2 className="text-lg font-semibold text-white">University</h2>
+                        <p className="text-sm text-gray-300">
+                          See how you rank in your university&lsquo;s leaderboard.
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-300">
+                      Note: You can only join one of each type of group and create
+                    </p>
+                    <p className="text-sm text-gray-400 italic mt-2">
+                      &quot;Understand! you better understand&quot;
+                    </p>
+                  </div>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogAction onClick={() => handleToggelUser()}>Continue</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </>
+      }
     </>
   )
 }
