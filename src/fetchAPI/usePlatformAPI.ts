@@ -36,101 +36,72 @@ const usePlatformAPI = () => {
   }
 
   const getGitHubHeatMap = async (username: string) => {
-    const response = await fetch('https://api.github.com/graphql', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: `query ($username: String!) {
-          user(login: $username) {
-            contributionsCollection {
-              contributionCalendar {
-                totalContributions
-                weeks {
-                  contributionDays {
-                    contributionCount
-                    date
-                  }
-                }
-              }
-            }
-          }
-        }`,
-        variables: { username },
-      }),
-    });
-
-    const data = await response.json();
-    return data.data?.user?.contributionsCollection;
-  }
-
-  const getGitHubCommits = async (username: string, privacy: boolean) => {
-    const variables: any = {
-      username: username,
-    };
-
-    if (privacy) {
-      variables.privacy = "PUBLIC";
-    }
-
-    const query = `query ($username: String! ${privacy ? ", $privacy: RepositoryPrivacy!" : ""}) {
-      user(login: $username) {
-        repositories(first: 100, ownerAffiliations: [OWNER, COLLABORATOR] ${privacy ? ", privacy: $privacy" : ""
-      }) {
-          nodes {
-            name
-            isPrivate
-            owner {
-              login
-            }
-            refs(first: 1, refPrefix: "refs/heads/") {
-              nodes {
-                target {
-                  ... on Commit {
-                    history(first: 100) {
-                      totalCount
-                      edges {
-                        node {
-                          committedDate
-                          message
-                          author {
-                            name
-                            email
-                            user {
-                              login
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+    try {
+      const response = await fetch('/api/plateform/get-github-heatmap', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username }),
+      });
+      
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.message);
       }
-    }`;
+      
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching GitHub heatmap:', error);
+      throw error;
+    }
+  }
+  
 
+  const getGitHubCommits = async (username: string, privacy: boolean, loadMore: boolean = false) => {
+    try {
+      // Store cursor in hook's local storage to maintain state between calls
+      let cursor = loadMore ? localStorage.getItem(`github-cursor-${username}`) : null;
 
-    const response = await fetch('https://api.github.com/graphql', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query,
-        variables,
-      }),
-    });
+      const response = await fetch('/api/plateform/get-github-commit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          username, 
+          privacy,
+          cursor 
+        }),
+      });
+      
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.message);
+      }
 
-    const data = await response.json();
-    return data.data.user.repositories.nodes;
+      // Store the new cursor for next pagination request
+      if (result.data.pageInfo.endCursor) {
+        localStorage.setItem(`github-cursor-${username}`, result.data.pageInfo.endCursor);
+      }
 
-  };
+      // If no more pages, clean up storage
+      if (!result.data.pageInfo.hasNextPage) {
+        localStorage.removeItem(`github-cursor-${username}`);
+      }
+
+      return {
+        repositories: result.data.repositories,
+        hasMore: result.data.pageInfo.hasNextPage,
+      };
+
+    } catch (error) {
+      console.error('Error fetching GitHub commits:', error);
+      throw error;
+    }
+  }
 
   const getCollaborateProfile = async (userData: any) => {
     try {
